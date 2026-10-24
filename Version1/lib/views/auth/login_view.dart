@@ -1,11 +1,11 @@
 // Vista de login
-// Permite login con demo para Reportante o Soporte Técnico
-// Al autenticar carga datos mock y navega al MainShell
+// Autenticaciï¿½n contra tabla usuarios en Supabase
 
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uts_qr_mantenimiento/logic/types.dart';
 import 'package:uts_qr_mantenimiento/providers/app_provider.dart';
-import 'package:uts_qr_mantenimiento/views/main_shell.dart';
+import '../main_shell.dart';
 
 class LoginView extends StatefulWidget {
   final AppProvider appProvider;
@@ -22,46 +22,58 @@ class _LoginViewState extends State<LoginView> {
   bool _loading = false;
   String? _error;
 
-  void _login({String? email, String? pass}) {
+  Future<void> _login({String? email, String? pass}) async {
     setState(() {
       _loading = true;
       _error = null;
     });
-    final finalEmail = email ?? _emailCtrl.text;
+    final finalEmail = (email ?? _emailCtrl.text).trim().toLowerCase();
     final finalPass = pass ?? _passCtrl.text;
-    // Validación básica
     if (finalEmail.isEmpty || finalPass.isEmpty) {
       setState(() {
         _loading = false;
-        _error = 'Por favor ingrese email y contraseña';
+        _error = 'Por favor ingrese email y contraseï¿½a';
       });
       return;
     }
-    // Simulación de login con delay (sin backend)
-    Future.delayed(const Duration(milliseconds: 600), () {
-      if (!mounted) return;
-      // Asigna rol según dominio/email para demo
-      if (finalEmail.contains('soporte')) {
-        widget.appProvider.setUser(UserSession(
-          id: 's1',
-          name: 'Soporte Técnico',
-          email: finalEmail,
-          role: Role.soporteTecnico,
-        ));
-      } else {
-        widget.appProvider.setUser(UserSession(
-          id: 'u1',
-          name: 'Docente / Estudiante',
-          email: finalEmail,
-          role: Role.reportante,
-        ));
+    try {
+      final supabase = Supabase.instance.client;
+      final res = await supabase
+          .from('usuarios')
+          .select()
+          .eq('correo', finalEmail)
+          .maybeSingle();
+      if (res == null) {
+        setState(() {
+          _loading = false;
+          _error = 'Usuario no encontrado en la base de datos';
+        });
+        return;
       }
-      // Carga datos mock para mantener funcionalidades
-      widget.appProvider.loadMockData();
+      final nombre = res['nombre']?.toString() ?? 'Usuario';
+      final rolStr = (res['rol']?.toString() ?? 'REPORTANTE').toUpperCase();
+      final id = res['id']?.toString() ?? finalEmail;
+      Role role = Role.reportante;
+      if (rolStr == 'SOPORTE_TECNICO' || rolStr.contains('SOPORTE')) {
+        role = Role.soporteTecnico;
+      }
+      widget.appProvider.setUser(UserSession(
+        id: id,
+        name: nombre,
+        email: finalEmail,
+        role: role,
+      ));
+      await widget.appProvider.loadFromSupabase();
+      if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => MainShell(appProvider: widget.appProvider)),
       );
-    });
+    } catch (e) {
+      setState(() {
+        _loading = false;
+        _error = 'Error al iniciar sesiÃ³n: $e';
+      });
+    }
   }
 
   @override
@@ -98,7 +110,7 @@ class _LoginViewState extends State<LoginView> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Gestión de resources institucionales',
+                  'Gestiï¿½n de resources institucionales',
                   style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
                 ),
                 const SizedBox(height: 32),
@@ -134,7 +146,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         const SizedBox(height: 8),
                         const Text(
-                          'Iniciar sesión',
+                          'Iniciar sesiï¿½n',
                           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
@@ -167,7 +179,7 @@ class _LoginViewState extends State<LoginView> {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        const Text('Contraseña', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+                        const Text('Contraseï¿½a', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                         const SizedBox(height: 6),
                         TextField(
                           controller: _passCtrl,
@@ -238,7 +250,7 @@ class _LoginViewState extends State<LoginView> {
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 10),
                               child: Text(
-                                'ACCESO RÁPIDO DEMO',
+                                'ACCESO Rï¿½PIDO DEMO',
                                 style: TextStyle(fontSize: 9, letterSpacing: 1.2, color: Colors.grey.shade600),
                               ),
                             ),
@@ -250,14 +262,14 @@ class _LoginViewState extends State<LoginView> {
                         _DemoBtn(
                           icon: Icons.school_outlined,
                           label: 'Estudiante o Docente',
-                          subtitle: 'Escanea QR y reporta averías',
+                          subtitle: 'Escanea QR y reporta averï¿½as',
                           onTap: () => _login(email: 'docente1@uts.edu.co', pass: 'doc123'),
                         ),
                         const SizedBox(height: 8),
                         _DemoBtn(
                           icon: Icons.headset_mic_outlined,
-                          label: 'Soporte Técnico',
-                          subtitle: 'Atiende órdenes y genera códigos QR',
+                          label: 'Soporte Tï¿½cnico',
+                          subtitle: 'Atiende ï¿½rdenes y genera cï¿½digos QR',
                           onTap: () => _login(email: 'soporte1@uts.edu.co', pass: 'soporte123'),
                         ),
                       ],
@@ -273,7 +285,7 @@ class _LoginViewState extends State<LoginView> {
   }
 }
 
-// Botón para acceso demo
+// Botï¿½n para acceso demo
 class _DemoBtn extends StatelessWidget {
   final IconData icon;
   final String label;

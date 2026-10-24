@@ -1,12 +1,11 @@
-// Punto de entrada de la aplicación UTS QR Mantenimiento
-// Inicializa la app con el proveedor de estado global (AppProvider)
-
 import 'package:flutter/material.dart';
-import 'package:uts_qr_mantenimiento/providers/app_provider.dart';
-import 'package:uts_qr_mantenimiento/views/splash_view.dart';
+import 'providers/app_provider.dart';
+import 'services/supabase_service.dart';
+import 'views/splash_view.dart' as splash;
 
-void main() {
-  // Ejecuta la app
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SupabaseService.initialize();
   runApp(const MyApp());
 }
 
@@ -18,12 +17,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // Instancia única del proveedor que gestiona estado global de la app
   final AppProvider _appProvider = AppProvider();
 
   @override
   Widget build(BuildContext context) {
-    // AnimatedBuilder escucha cambios en el AppProvider para rebuilds reactivos
     return AnimatedBuilder(
       animation: _appProvider,
       builder: (context, _) {
@@ -32,7 +29,6 @@ class _MyAppState extends State<MyApp> {
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             useMaterial3: true,
-            // Paleta de colores institucionales
             colorScheme: ColorScheme.fromSeed(
               seedColor: const Color(0xFF0F766E),
               primary: const Color(0xFF0F766E),
@@ -46,8 +42,7 @@ class _MyAppState extends State<MyApp> {
               centerTitle: false,
             ),
           ),
-          // Vista inicial
-          home: SplashView(appProvider: _appProvider),
+          home: splash.SplashView(appProvider: _appProvider),
         );
       },
     );

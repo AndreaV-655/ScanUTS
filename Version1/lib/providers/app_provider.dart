@@ -1,182 +1,76 @@
 // Proveedor de estado global usando ChangeNotifier
-// Centraliza usuario, navegación por tabs, datos mock y estado de UI
-// Sin persistencia offline - datos cargados en memoria
+// Centraliza usuario, navegaci?n por tabs, datos y estado de UI
+// Sin persistencia offline - datos cargados en memoria desde Supabase
 
 import 'package:flutter/foundation.dart';
-import 'package:uts_qr_mantenimiento/logic/types.dart';
+import '../logic/types.dart';
+import '../services/supabase_data_service.dart';
 
 class AppProvider extends ChangeNotifier {
-  // === SESIÓN ===
-  UserSession? _user;
-  // === NAVEGACIÓN ===
-  String _activeTab = 'home'; // home, scan, generate-qr, reports, maint, stats, profile
+  AppUser? _currentUser;
+  List<AppUser> _usuarios = [];
+  List<Recurso> _recursos = [];
+  List<ReporteAveria> _reportes = [];
+  List<MantenimientoPreventivo> _mantenimientosPreventivos = [];
+  List<HistorialMantenimiento> _historial = [];
+  int _currentTabIndex = 0;
+  bool _loading = false;
 
-  // === DATOS ===
-  List<Resource> _resources = [];
-  List<ReporteAveria> _reports = [];
-  List<MantenimientoPreventivo> _preventivos = [];
-  Stats? _stats;
+  AppUser? get currentUser => _currentUser;
+  List<AppUser> get usuarios => _usuarios;
+  List<Recurso> get recursos => _recursos;
+  List<ReporteAveria> get reportes => _reportes;
+  List<MantenimientoPreventivo> get mantenimientosPreventivos => _mantenimientosPreventivos;
+  List<HistorialMantenimiento> get historial => _historial;
+  int get currentTabIndex => _currentTabIndex;
+  bool get loading => _loading;
 
-  // === UI: detalles/hojas/modal ===
-  Resource? _scannedResource;
-  bool _resourceSheetOpen = false;
-  bool _newReportFlowOpen = false;
-  ReporteAveria? _reportDetailOpen;
-
-  // Getters
-  UserSession? get user => _user;
-  String get activeTab => _activeTab;
-  List<Resource> get resources => _resources;
-  List<ReporteAveria> get reports => _reports;
-  List<MantenimientoPreventivo> get preventivos => _preventivos;
-  Stats? get stats => _stats;
-  Resource? get scannedResource => _scannedResource;
-  bool get resourceSheetOpen => _resourceSheetOpen;
-  bool get newReportFlowOpen => _newReportFlowOpen;
-  ReporteAveria? get reportDetailOpen => _reportDetailOpen;
-
-  // Setters con notificación a listeners
-  void setUser(UserSession? u) {
-    _user = u;
+  void setCurrentTab(int index) {
+    _currentTabIndex = index;
     notifyListeners();
   }
 
-  void setActiveTab(String t) {
-    _activeTab = t;
+  void setCurrentUser(AppUser? user) {
+    _currentUser = user;
     notifyListeners();
   }
 
-  void setResources(List<Resource> r) {
-    _resources = r;
+  Future<void> loadFromSupabase() async {
+    _loading = true;
     notifyListeners();
+    try {
+      final service = SupabaseDataService();
+      final usuarios = await service.getUsuarios();
+      final recursos = await service.getRecursos();
+      final reportes = await service.getReportes();
+      _usuarios = usuarios;
+      _recursos = recursos;
+      _reportes = reportes;
+    } catch (e) {
+      // Si falla, mantener datos vac?os
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
   }
 
-  void setReports(List<ReporteAveria> r) {
-    _reports = r;
-    notifyListeners();
-  }
-
-  void setPreventivos(List<MantenimientoPreventivo> p) {
-    _preventivos = p;
-    notifyListeners();
-  }
-
-  void setStats(Stats? s) {
-    _stats = s;
-    notifyListeners();
-  }
-
-  void setScannedResource(Resource? r) {
-    _scannedResource = r;
-    notifyListeners();
-  }
-
-  void setResourceSheetOpen(bool b) {
-    _resourceSheetOpen = b;
-    notifyListeners();
-  }
-
-  void setNewReportFlowOpen(bool b) {
-    _newReportFlowOpen = b;
-    notifyListeners();
-  }
-
-  void setReportDetailOpen(ReporteAveria? r) {
-    _reportDetailOpen = r;
-    notifyListeners();
-  }
-
-  // Carga datos mock para mantener funcionalidades sin modo offline
-  // En producción estos datos vendrían de un backend/API
+  // Mantener m?todo para compatibilidad
   void loadMockData() {
-    _resources = [
-      Resource(
-        id: 'r1',
-        codigo: 'EQ-001',
-        nombre: 'Computador Aula 101',
-        tipo: TipoRecurso.computador,
-        marca: 'HP',
-        modelo: 'EliteDesk',
-        numeroSerie: 'HP-12345',
-        bloque: 'A',
-        aula: '101',
-        estado: EstadoRecurso.operativo,
-        reportesActivos: 0,
-      ),
-      Resource(
-        id: 'r2',
-        codigo: 'EQ-002',
-        nombre: 'Proyector Aula 102',
-        tipo: TipoRecurso.proyector,
-        marca: 'Epson',
-        modelo: 'XGA',
-        numeroSerie: 'EP-67890',
-        bloque: 'A',
-        aula: '102',
-        estado: EstadoRecurso.mantenimiento,
-        reportesActivos: 1,
-      ),
-    ];
-    _reports = [
-      ReporteAveria(
-        id: 'rep1',
-        codigo: 'REP-001',
-        resourceId: 'r1',
-        usuarioReportanteId: 'u1',
-        descripcion: 'No enciende',
-        categoria: CategoriaFalla.electrica,
-        prioridad: Prioridad.alto,
-        tipoMantenimiento: 'CORRECTIVO',
-        estado: EstadoReporte.pendiente,
-        fechaReporte: DateTime.now().toIso8601String(),
-        confirmadoUsuario: false,
-        resource: Resource(
-          id: 'r1',
-          codigo: 'EQ-001',
-          nombre: 'Computador Aula 101',
-          tipo: TipoRecurso.computador,
-          marca: 'HP',
-          modelo: 'EliteDesk',
-          numeroSerie: 'HP-12345',
-          bloque: 'A',
-          aula: '101',
-          estado: EstadoRecurso.operativo,
-        ),
-      ),
-    ];
-    _preventivos = [];
-    _stats = Stats(
-      recursos: {
-        'total': 2,
-        'operativos': 1,
-        'enMantenimiento': 1,
-        'fueraServicio': 0,
-        'tasaDisponibilidad': '50.0'
-      },
-      reportes: {
-        'total': 1,
-        'pendientes': 1,
-        'enProceso': 0,
-        'atendidos': 0,
-        'cerrados': 0,
-        'reabiertos': 0,
-        'criticosAbiertos': 0,
-        'ultimaSemana': 1
-      },
-      tiempos: {'promedioRespuestaHoras': '0', 'promedioResolucionHoras': '0'},
-      fallasPorTipo: [
-        {'tipo': 'COMPUTADOR', 'total': 1}
-      ],
-      fallasPorCategoria: [
-        {'categoria': 'ELECTRICA', 'total': 1}
-      ],
-      preventivo: {
-        'total': 0,
-        'vencidos': 0,
-        'programados': 0,
-        'cumplimiento': '100'
-      },
-    );
-    notifyListeners();
+    loadFromSupabase();
+  }
+
+  List<ReporteAveria> reportesByUsuario(String usuarioId) {
+    return _reportes.where((r) => r.usuarioReportanteId == usuarioId).toList()
+      ..sort((a, b) => b.fechaReporte.compareTo(a.fechaReporte));
+  }
+
+  List<ReporteAveria> reportesAsignados(String tecnicoId) {
+    return _reportes.where((r) => r.tecnicoId == tecnicoId).toList()
+      ..sort((a, b) => b.fechaReporte.compareTo(a.fechaReporte));
+  }
+
+  List<ReporteAveria> reportesPendientes() {
+    return _reportes.where((r) => r.estado == EstadoReporte.pendiente).toList()
+      ..sort((a, b) => b.fechaReporte.compareTo(a.fechaReporte));
   }
 }
