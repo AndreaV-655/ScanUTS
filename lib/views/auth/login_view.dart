@@ -3,7 +3,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uts_qr_mantenimiento/logic/types.dart';
+import 'package:uts_qr_mantenimiento/models/types.dart';
 import 'package:uts_qr_mantenimiento/providers/app_provider.dart';
 import '../main_shell.dart';
 

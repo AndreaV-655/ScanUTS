@@ -1,7 +1,7 @@
 // Servicio de datos base (sin inyección externa)
 // Actualmente usa listas vacías; se puede ampliar con lógica local
 
-import '../logic/types.dart';
+import '../models/types.dart';
 
 class DataService {
   static List<Resource> getResources() {

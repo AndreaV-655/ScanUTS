@@ -2,7 +2,7 @@
 // Usa solo Dart
 
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../logic/types.dart';
+import '../models/types.dart';
 
 class SupabaseDataService {
   final SupabaseClient _client = Supabase.instance.client;

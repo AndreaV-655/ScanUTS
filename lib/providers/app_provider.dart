@@ -3,7 +3,7 @@
 // Los datos se cargan en memoria desde Supabase
 
 import 'package:flutter/foundation.dart';
-import '../logic/types.dart';
+import '../models/types.dart';
 import '../services/supabase_data_service.dart';
 
 class AppProvider extends ChangeNotifier {
