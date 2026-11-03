@@ -1,5 +1,5 @@
 -- Esquema para UTS QR Mantenimiento
--- Crear tablas con nombres en espa?ol, permitir acentos
+-- Crear tablas con nombres en español, permitir acentos
 
 CREATE TABLE IF NOT EXISTS usuarios (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -76,9 +76,9 @@ CREATE TABLE IF NOT EXISTS historial_mantenimiento (
   observaciones TEXT
 );
 
--- Datos m?nimos
+-- Datos mínimos
 INSERT INTO usuarios (nombre, correo, rol) VALUES
-('Soporte T?cnico', 'soporte1@uts.edu.co', 'SOPORTE_TECNICO'),
+('Soporte Técnico', 'soporte1@uts.edu.co', 'SOPORTE_TECNICO'),
 ('Docente / Estudiante', 'docente1@uts.edu.co', 'REPORTANTE')
 ON CONFLICT (correo) DO NOTHING;
 

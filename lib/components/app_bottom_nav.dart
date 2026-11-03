@@ -39,32 +39,40 @@ class AppBottomNav extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: items.map((item) {
               final active = appProvider.activeTab == item.key;
-              return InkWell(
-                onTap: () => appProvider.setActiveTab(item.key),
-                borderRadius: BorderRadius.circular(12),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        active ? item.activeIcon : item.icon,
-                        size: 22,
-                        color: active ? const Color(0xFF0F766E) : Colors.black54,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        item.label,
-                        style: TextStyle(
-                          fontSize: 10,
+              return Expanded(
+                child: InkWell(
+                  onTap: () => appProvider.setActiveTab(item.key),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          active ? item.activeIcon : item.icon,
+                          size: 20,
                           color: active ? const Color(0xFF0F766E) : Colors.black54,
-                          fontWeight: active ? FontWeight.w600 : FontWeight.w400,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 2),
+                        SizedBox(
+                          height: 12,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              item.label,
+                              maxLines: 1,
+                              style: TextStyle(
+                                fontSize: 9,
+                                color: active ? const Color(0xFF0F766E) : Colors.black54,
+                                fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );

@@ -199,6 +199,139 @@ class AppProvider extends ChangeNotifier {
     }
   }
 
+  /// Carga datos de ejemplo en memoria para probar la app sin conexión.
+  /// Se usa desde los accesos demo del login.
+  void loadDemoData() {
+    final ahora = DateTime.now();
+    _usuarios = [
+      AppUser(
+        id: 'demo-soporte',
+        nombre: 'Soporte Técnico',
+        correo: 'soporte1@uts.edu.co',
+        area: 'Sistemas',
+        rol: UserRole.soporteTecnico,
+      ),
+      AppUser(
+        id: 'demo-reportante',
+        nombre: 'Docente / Estudiante',
+        correo: 'docente1@uts.edu.co',
+        area: 'Aulas',
+        rol: UserRole.reportante,
+      ),
+    ];
+    _recursos = [
+      Recurso(
+        id: 'demo-eq-1',
+        codigo: 'EQ-001',
+        nombre: 'Computador Aula 101',
+        tipo: 'COMPUTADOR',
+        marca: 'HP',
+        modelo: 'EliteDesk',
+        numeroSerie: 'HP-12345',
+        bloque: 'A',
+        aula: '101',
+        estado: RecursoEstado.operativo,
+        reportesActivos: 1,
+      ),
+      Recurso(
+        id: 'demo-eq-2',
+        codigo: 'EQ-002',
+        nombre: 'Proyector Aula 102',
+        tipo: 'PROYECTOR',
+        marca: 'Epson',
+        modelo: 'XGA',
+        numeroSerie: 'EP-67890',
+        bloque: 'A',
+        aula: '102',
+        estado: RecursoEstado.mantenimiento,
+        reportesActivos: 1,
+      ),
+      Recurso(
+        id: 'demo-eq-3',
+        codigo: 'EQ-003',
+        nombre: 'Aire acondicionado Bloque B',
+        tipo: 'AIRE_ACONDICIONADO',
+        marca: 'LG',
+        modelo: 'Dual Inverter',
+        numeroSerie: 'LG-55221',
+        bloque: 'B',
+        aula: '201',
+        estado: RecursoEstado.fueraServicio,
+        reportesActivos: 1,
+      ),
+    ];
+    _reportes = [
+      ReporteAveria(
+        id: 'demo-rep-1',
+        codigo: 'REP-001',
+        recursoId: 'demo-eq-1',
+        usuarioReportanteId: 'demo-reportante',
+        descripcion: 'El computador no enciende desde esta mañana.',
+        categoria: 'ELÉCTRICA',
+        prioridad: 'ALTO',
+        tipoMantenimiento: 'CORRECTIVO',
+        estado: EstadoReporte.pendiente,
+        fechaReporte: ahora.subtract(const Duration(hours: 3)),
+        confirmadoUsuario: false,
+      ),
+      ReporteAveria(
+        id: 'demo-rep-2',
+        codigo: 'REP-002',
+        recursoId: 'demo-eq-2',
+        usuarioReportanteId: 'demo-reportante',
+        tecnicoId: 'demo-soporte',
+        descripcion: 'El proyector se apaga solo después de 10 minutos.',
+        categoria: 'ELÉCTRICA',
+        prioridad: 'MEDIA',
+        tipoMantenimiento: 'CORRECTIVO',
+        estado: EstadoReporte.enProceso,
+        fechaReporte: ahora.subtract(const Duration(days: 1, hours: 2)),
+        fechaAceptacion: ahora.subtract(const Duration(days: 1)),
+        confirmadoUsuario: false,
+      ),
+      ReporteAveria(
+        id: 'demo-rep-3',
+        codigo: 'REP-003',
+        recursoId: 'demo-eq-3',
+        usuarioReportanteId: 'demo-reportante',
+        tecnicoId: 'demo-soporte',
+        descripcion: 'El aire acondicionado no enfría y hace ruido.',
+        categoria: 'FÍSICA',
+        prioridad: 'CRITICO',
+        tipoMantenimiento: 'CORRECTIVO',
+        estado: EstadoReporte.reabierto,
+        fechaReporte: ahora.subtract(const Duration(days: 2)),
+        fechaAceptacion: ahora.subtract(const Duration(days: 2)),
+        fechaAtencion: ahora.subtract(const Duration(days: 1, hours: 4)),
+        intervencionRealizada: 'Se limpiaron los filtros.',
+        observacionesTecnico: 'Se recomienda revisar el compresor.',
+        confirmadoUsuario: false,
+        observacionesReapertura: 'Sigue haciendo ruido.',
+      ),
+      ReporteAveria(
+        id: 'demo-rep-4',
+        codigo: 'REP-004',
+        recursoId: 'demo-eq-1',
+        usuarioReportanteId: 'demo-reportante',
+        tecnicoId: 'demo-soporte',
+        descripcion: 'Mouse del computador no responde.',
+        categoria: 'OTRA',
+        prioridad: 'BAJO',
+        tipoMantenimiento: 'CORRECTIVO',
+        estado: EstadoReporte.cerrado,
+        fechaReporte: ahora.subtract(const Duration(days: 6)),
+        fechaAceptacion: ahora.subtract(const Duration(days: 6)),
+        fechaAtencion: ahora.subtract(const Duration(days: 5)),
+        fechaConfirmacion: ahora.subtract(const Duration(days: 5)),
+        intervencionRealizada: 'Se reemplazó el mouse.',
+        confirmadoUsuario: true,
+      ),
+    ];
+    _error = null;
+    _loading = false;
+    notifyListeners();
+  }
+
   // Mantener método para compatibilidad
   void loadMockData() {
     loadFromSupabase();

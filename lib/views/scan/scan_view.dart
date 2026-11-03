@@ -7,7 +7,7 @@ class ScanView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
@@ -59,6 +59,61 @@ class ScanView extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('¿Cómo escanear?', style: TextStyle(fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                _Paso(numero: '1', texto: 'Ubica el código QR pegado al recurso.'),
+                _Paso(numero: '2', texto: 'Presiona "Iniciar escaneo" y permite el acceso a la cámara.'),
+                _Paso(numero: '3', texto: 'Revisa los datos del recurso y reporta la avería.'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Paso extends StatelessWidget {
+  final String numero;
+  final String texto;
+  const _Paso({required this.numero, required this.texto});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 20,
+            width: 20,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: Color(0xFFF0FDFA),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              numero,
+              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF0F766E)),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(texto, style: const TextStyle(fontSize: 12, color: Colors.black54)),
           ),
         ],
       ),

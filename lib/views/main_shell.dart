@@ -112,6 +112,8 @@ class MainShell extends StatelessWidget {
             ],
           ),
           body: SafeArea(
+            top: false,
+            bottom: false,
             child: Column(
               children: [
                 if (appProvider.loading)
