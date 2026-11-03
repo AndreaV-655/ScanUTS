@@ -2,6 +2,7 @@
 // Autenticación contra tabla usuarios en Supabase
 // Incluye acceso demo local para probar sin conexión
 
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uts_qr_mantenimiento/models/types.dart';
