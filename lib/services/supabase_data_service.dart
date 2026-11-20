@@ -17,7 +17,7 @@ class SupabaseDataService {
         correo: row['correo'] ?? '',
         telefono: row['telefono'],
         area: row['area'],
-        rol: row['rol'] == 'SOPORTE_TECNICO' ? UserRole.soporteTecnico : UserRole.reportante,
+        rol: row['rol'] == 'SOPORTE_TECNICO' ? Role.soporteTecnico : Role.reportante,
         avatarUrl: row['avatar_url'],
       ));
     }

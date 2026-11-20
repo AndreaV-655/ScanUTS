@@ -2,9 +2,6 @@
 
 enum Role { reportante, soporteTecnico }
 
-enum UserRole { reportante, soporteTecnico }
-
-enum EstadoRecurso { operativo, mantenimiento, fueraServicio }
 enum RecursoEstado { operativo, mantenimiento, fueraServicio }
 
 enum EstadoReporte { pendiente, enProceso, atendido, reabierto, cerrado, aceptado, enAtencion, resuelto }
@@ -41,7 +38,7 @@ class AppUser {
   final String correo;
   final String? telefono;
   final String? area;
-  final UserRole rol;
+  final Role rol;
   final String? avatarUrl;
 
   AppUser({
@@ -52,40 +49,6 @@ class AppUser {
     this.area,
     required this.rol,
     this.avatarUrl,
-  });
-}
-
-class Resource {
-  final String id;
-  final String codigo;
-  final String nombre;
-  final TipoRecurso tipo;
-  final String marca;
-  final String modelo;
-  final String numeroSerie;
-  final String bloque;
-  final String aula;
-  final EstadoRecurso estado;
-  final String? fechaCompra;
-  final double? costoEstimado;
-  final String? qrData;
-  final int? reportesActivos;
-
-  Resource({
-    required this.id,
-    required this.codigo,
-    required this.nombre,
-    required this.tipo,
-    required this.marca,
-    required this.modelo,
-    required this.numeroSerie,
-    required this.bloque,
-    required this.aula,
-    required this.estado,
-    this.fechaCompra,
-    this.costoEstimado,
-    this.qrData,
-    this.reportesActivos,
   });
 }
 
@@ -126,7 +89,6 @@ class Recurso {
 class ReporteAveria {
   final String id;
   final String codigo;
-  final String resourceId;
   final String usuarioReportanteId;
   final String? tecnicoId;
   final String descripcion;
@@ -145,7 +107,7 @@ class ReporteAveria {
   final String? observacionesTecnico;
   final bool confirmadoUsuario;
   final String? observacionesReapertura;
-  final Resource? resource;
+  final Recurso? resource;
   final Map<String, dynamic>? usuarioReportante;
   final Map<String, dynamic>? tecnico;
   final String? recursoId;
@@ -153,7 +115,6 @@ class ReporteAveria {
   ReporteAveria({
     required this.id,
     required this.codigo,
-    this.resourceId = '',
     required this.usuarioReportanteId,
     this.tecnicoId,
     required this.descripcion,
@@ -199,17 +160,17 @@ class Stats {
 
 class MantenimientoPreventivo {
   final String id;
-  final String resourceId;
+  final String recursoId;
   final String descripcion;
   final int periodicidadMeses;
   final String fechaProgramada;
   final String? ultimaEjecucion;
   final String estado;
-  final Resource? resource;
+  final Recurso? resource;
 
   MantenimientoPreventivo({
     required this.id,
-    required this.resourceId,
+    required this.recursoId,
     required this.descripcion,
     required this.periodicidadMeses,
     required this.fechaProgramada,

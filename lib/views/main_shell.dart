@@ -8,6 +8,8 @@ import 'package:uts_qr_mantenimiento/views/home/home_view.dart';
 import 'package:uts_qr_mantenimiento/views/scan/scan_view.dart';
 import 'package:uts_qr_mantenimiento/views/generate_qr/generate_qr_view.dart';
 import 'package:uts_qr_mantenimiento/views/reports/reports_view.dart';
+import 'package:uts_qr_mantenimiento/views/reports/report_form_view.dart';
+import 'package:uts_qr_mantenimiento/models/types.dart';
 import 'package:uts_qr_mantenimiento/views/maint/maint_view.dart';
 import 'package:uts_qr_mantenimiento/views/stats/stats_view.dart';
 import 'package:uts_qr_mantenimiento/views/profile/profile_view.dart';
@@ -130,6 +132,24 @@ class MainShell extends StatelessWidget {
               ],
             ),
           ),
+          floatingActionButton: appProvider.activeTab == 'reports' &&
+                  user.role == Role.reportante
+              ? FloatingActionButton(
+                  tooltip: 'Agregar reporte',
+                  onPressed: () async {
+                    final guardado = await Navigator.of(context).push<bool>(
+                      MaterialPageRoute(
+                        builder: (_) => ReportFormView(appProvider: appProvider),
+                      ),
+                    );
+                    if (guardado != true || !context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Reporte de prueba agregado')),
+                    );
+                  },
+                  child: const Icon(Icons.add),
+                )
+              : null,
           bottomNavigationBar: AppBottomNav(appProvider: appProvider, user: user),
         );
       },

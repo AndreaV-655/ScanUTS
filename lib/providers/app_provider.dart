@@ -27,6 +27,7 @@ class AppProvider extends ChangeNotifier {
   String get activeTab => _activeTab;
   bool get loading => _loading;
   String? get error => _error;
+  bool get isDemo => _user?.id == 'demo-reportante' || _user?.id == 'demo-soporte';
 
   int get recursosOperativos =>
       _recursos.where((r) => r.estado == RecursoEstado.operativo).length;
@@ -183,6 +184,7 @@ class AppProvider extends ChangeNotifier {
   }
 
   Future<void> loadFromSupabase() async {
+    if (isDemo) return;
     _loading = true;
     _error = null;
     notifyListeners();
@@ -209,14 +211,14 @@ class AppProvider extends ChangeNotifier {
         nombre: 'Soporte Técnico',
         correo: 'soporte1@uts.edu.co',
         area: 'Sistemas',
-        rol: UserRole.soporteTecnico,
+        rol: Role.soporteTecnico,
       ),
       AppUser(
         id: 'demo-reportante',
         nombre: 'Docente / Estudiante',
         correo: 'docente1@uts.edu.co',
         area: 'Aulas',
-        rol: UserRole.reportante,
+        rol: Role.reportante,
       ),
     ];
     _recursos = [
@@ -329,6 +331,39 @@ class AppProvider extends ChangeNotifier {
     ];
     _error = null;
     _loading = false;
+    notifyListeners();
+  }
+
+  void agregarReporteDemo({
+    required String recursoId,
+    required String descripcion,
+    required String categoria,
+    required String prioridad,
+  }) {
+    final reportante = _user;
+    if (reportante?.id != 'demo-reportante' ||
+        !_recursos.any((recurso) => recurso.id == recursoId) ||
+        descripcion.trim().isEmpty) {
+      throw StateError('No se pudo registrar el reporte de prueba.');
+    }
+
+    final numero = _reportes.length + 1;
+    _reportes.insert(
+      0,
+      ReporteAveria(
+        id: 'demo-rep-$numero',
+        codigo: 'REP-${numero.toString().padLeft(3, '0')}',
+        recursoId: recursoId,
+        usuarioReportanteId: reportante!.id,
+        descripcion: descripcion.trim(),
+        categoria: categoria,
+        prioridad: prioridad,
+        tipoMantenimiento: 'CORRECTIVO',
+        estado: EstadoReporte.pendiente,
+        fechaReporte: DateTime.now(),
+        confirmadoUsuario: false,
+      ),
+    );
     notifyListeners();
   }
 

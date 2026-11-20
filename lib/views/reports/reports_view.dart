@@ -17,7 +17,9 @@ class ReportsView extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: appProvider.loadFromSupabase,
           child: ListView(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.fromLTRB(
+              16, 16, 16, appProvider.user?.role == Role.reportante ? 88 : 16,
+            ),
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -37,10 +39,11 @@ class ReportsView extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 4),
-              const Text(
-                'Desliza hacia abajo para actualizar',
-                style: TextStyle(fontSize: 11, color: Colors.black45),
-              ),
+              if (!appProvider.isDemo)
+                const Text(
+                  'Desliza hacia abajo para actualizar',
+                  style: TextStyle(fontSize: 11, color: Colors.black45),
+                ),
               if (appProvider.error != null) ...[
                 const SizedBox(height: 12),
                 Container(
